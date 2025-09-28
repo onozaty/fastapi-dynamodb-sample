@@ -16,6 +16,17 @@ services:
       - https_proxy=${HTTPS_PROXY-}
       - no_proxy=${NO_PROXY-}
       - UV_LINK_MODE=copy 
+    depends_on:
+      - dynamodb-local
     volumes:
       - ../..:/workspaces:cached
     command: sleep infinity
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./dynamodb-data:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal

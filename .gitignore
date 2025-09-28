@@ -3,5 +3,6 @@
 .ruff_cache/
 .venv/
 .coverage
+.devcontainer/dynamodb-data/
 coverage.xml
 coverage-html/
