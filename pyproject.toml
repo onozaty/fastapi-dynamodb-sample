@@ -1,0 +1,46 @@
+[project]
+name = "fastapi-dynamodb-sample"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.116.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.13.0",
+]
+
+[tool.ruff.lint]
+select = [
+    # https://docs.astral.sh/ruff/rules/
+    "E",   # pycodestyle error
+    "F",   # Pyflakes
+    "N",   # pep8-naming
+    "ANN", # flake8-annotations
+]
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = "--cov=app --cov-report=term-missing --cov-report=html --cov-report=xml"
+
+[tool.coverage.run]
+source = [
+    "app",
+]
+omit = [
+    "tests/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.html]
+directory = "coverage-html"
+
+[tool.coverage.xml]
+output = "coverage.xml"
