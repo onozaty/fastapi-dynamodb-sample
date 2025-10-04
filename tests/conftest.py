@@ -1,16 +1,17 @@
+from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
+from moto import mock_aws
 
+from app.db.dynamodb import ensure_all_tables_exist
 from app.main import app
-from app.services import item_service
 
 
 @pytest.fixture
-def client() -> TestClient:
-    return TestClient(app)
+def client() -> Generator[TestClient, None, None]:
+    """Create a test client with a fresh DynamoDB table for each test."""
 
-
-@pytest.fixture(autouse=True)
-def reset_fake_db() -> None:
-    item_service.fake_items_db.clear()
-    item_service.current_id = 0
+    with mock_aws():
+        ensure_all_tables_exist()
+        yield TestClient(app)

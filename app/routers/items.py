@@ -26,7 +26,7 @@ async def get_items(svc: ItemService = Depends()) -> list[ItemResponse]:
         },
     },
 )
-async def get_item(item_id: int, svc: ItemService = Depends()) -> ItemResponse | None:
+async def get_item(item_id: str, svc: ItemService = Depends()) -> ItemResponse | None:
     item = svc.get_item(item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")

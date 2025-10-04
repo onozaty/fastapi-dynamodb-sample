@@ -9,7 +9,8 @@ def test_create_item(client: TestClient) -> None:
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["id"] == 1
+    assert "id" in payload
+    assert isinstance(payload["id"], str)
     assert payload["name"] == "Apple"
     assert payload["description"] == "Juicy"
     assert payload["price"] == 120
@@ -30,26 +31,28 @@ def test_get_items_returns_all_created_items(client: TestClient) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 2
-    assert payload[0]["name"] == "Apple"
-    assert payload[1]["name"] == "Banana"
+    # DynamoDB scan doesn't guarantee order, so check by name set
+    names = {item["name"] for item in payload}
+    assert names == {"Apple", "Banana"}
 
 
 def test_get_item_returns_single_item(client: TestClient) -> None:
-    client.post(
+    create_response = client.post(
         "/items/",
         json={"name": "Apple", "description": "Juicy", "price": 120},
     )
+    item_id = create_response.json()["id"]
 
-    response = client.get("/items/1")
+    response = client.get(f"/items/{item_id}")
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["id"] == 1
+    assert payload["id"] == item_id
     assert payload["name"] == "Apple"
 
 
 def test_get_item_returns_404_when_missing(client: TestClient) -> None:
-    response = client.get("/items/999")
+    response = client.get("/items/nonexistent-id-12345")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Item not found"}

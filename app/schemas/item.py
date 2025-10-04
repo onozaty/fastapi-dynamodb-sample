@@ -17,4 +17,7 @@ class ItemCreate(ItemBase):
 
 
 class ItemResponse(ItemBase):
-    id: int = Field(title="The ID of the item", examples=[1])
+    id: str = Field(
+        title="The ID of the item",
+        examples=["01937c6e-77b2-7f9e-ae59-8e579f5e6c7e"],
+    )
