@@ -4,9 +4,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """環境変数から読み込まれるアプリケーション設定。"""
 
-    # DynamoDB settings
+    # DynamoDB設定
     dynamodb_endpoint_url: str | None = None
     aws_region: str = "us-east-1"
     aws_access_key_id: str | None = None

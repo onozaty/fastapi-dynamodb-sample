@@ -10,7 +10,7 @@ from app.main import app
 
 @pytest.fixture
 def client() -> Generator[TestClient, None, None]:
-    """Create a test client with a fresh DynamoDB table for each test."""
+    """各テストごとに新しいDynamoDBテーブルを使用してテストクライアントを作成する。"""
 
     with mock_aws():
         ensure_all_tables_exist()

@@ -7,10 +7,10 @@ from app.tables.item import ItemTable
 
 
 class ItemRepository:
-    """Repository for managing items using PynamoDB."""
+    """PynamoDBを使用してアイテムを管理するリポジトリ。"""
 
     def create_item(self, item: ItemCreate) -> ItemResponse:
-        """Create a new item in DynamoDB."""
+        """DynamoDBに新しいアイテムを作成する。"""
         item_id = str(uuid4())
 
         # PynamoDBモデルを作成
@@ -32,7 +32,7 @@ class ItemRepository:
         )
 
     def get_item(self, item_id: str) -> ItemResponse | None:
-        """Get an item by ID from DynamoDB."""
+        """DynamoDBからIDでアイテムを取得する。"""
         try:
             db_item = ItemTable.get(item_id)
             return ItemResponse(
@@ -45,7 +45,7 @@ class ItemRepository:
             return None
 
     def get_all_items(self) -> list[ItemResponse]:
-        """Get all items from DynamoDB."""
+        """DynamoDBから全てのアイテムを取得する。"""
         items: list[ItemResponse] = []
         for db_item in ItemTable.scan():
             items.append(
@@ -60,17 +60,16 @@ class ItemRepository:
 
     @staticmethod
     def _normalize_description(description: str | None) -> str | None:
-        """Normalize description for DynamoDB storage.
+        """DynamoDBストレージ用にdescriptionを正規化する。
 
-        Convert empty strings to None to omit the attribute in DynamoDB,
-        which saves storage costs and enables sparse indexes.
+        空文字列をNoneに変換してDynamoDBの属性を省略することで、
+        ストレージコストを削減し、スパースインデックスを有効にする。
 
         Args:
-            description: The description value from the input.
+            description: 入力からのdescription値。
 
         Returns:
-            None if the description is empty or whitespace-only, otherwise the
-            original value.
+            descriptionが空または空白のみの場合はNone、それ以外は元の値。
         """
         if description is None:
             return None

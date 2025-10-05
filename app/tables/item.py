@@ -5,7 +5,7 @@ from app.settings import settings
 
 
 class ItemTable(Model):
-    """DynamoDB Item table using PynamoDB ORM."""
+    """PynamoDB ORMを使用したDynamoDB Itemテーブル。"""
 
     class Meta:  # type: ignore[misc]
         table_name = "items"
@@ -14,10 +14,10 @@ class ItemTable(Model):
         if settings.dynamodb_endpoint_url:
             host = settings.dynamodb_endpoint_url
 
-    # Primary key
+    # プライマリキー
     id = UnicodeAttribute(hash_key=True)
 
-    # Attributes
+    # 属性
     name = UnicodeAttribute()
     description = UnicodeAttribute(null=True)
     price = NumberAttribute()

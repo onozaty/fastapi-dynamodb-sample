@@ -8,11 +8,13 @@ router = APIRouter(prefix="/items", tags=["items"])
 
 @router.post("/", response_model=ItemResponse)
 async def create_item(item: ItemCreate, svc: ItemService = Depends()) -> ItemResponse:
+    """新しいアイテムを作成する。"""
     return svc.create_item(item)
 
 
 @router.get("/", response_model=list[ItemResponse])
 async def get_items(svc: ItemService = Depends()) -> list[ItemResponse]:
+    """全てのアイテムを取得する。"""
     return svc.get_items()
 
 
@@ -27,6 +29,7 @@ async def get_items(svc: ItemService = Depends()) -> list[ItemResponse]:
     },
 )
 async def get_item(item_id: str, svc: ItemService = Depends()) -> ItemResponse | None:
+    """指定されたIDのアイテムを取得する。"""
     item = svc.get_item(item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")

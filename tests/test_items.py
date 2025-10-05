@@ -31,7 +31,7 @@ def test_get_items_returns_all_created_items(client: TestClient) -> None:
     assert response.status_code == 200
     payload = response.json()
     assert len(payload) == 2
-    # DynamoDB scan doesn't guarantee order, so check by name set
+    # DynamoDB scanは順序を保証しないため、名前のセットで確認
     names = {item["name"] for item in payload}
     assert names == {"Apple", "Banana"}
 
