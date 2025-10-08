@@ -10,9 +10,12 @@ class ItemTable(Model):
     class Meta:  # type: ignore[misc]
         table_name = "items"
         region = settings.aws_region
-        # DynamoDB LocalやmotoのendpointURL指定
         if settings.dynamodb_endpoint_url:
             host = settings.dynamodb_endpoint_url
+        if settings.aws_access_key_id:
+            aws_access_key_id = settings.aws_access_key_id
+        if settings.aws_secret_access_key:
+            aws_secret_access_key = settings.aws_secret_access_key
 
     # プライマリキー
     id = UnicodeAttribute(hash_key=True)
