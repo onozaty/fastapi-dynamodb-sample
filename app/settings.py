@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     # DynamoDB設定
     dynamodb_endpoint_url: str | None = None
-    aws_region: str = "us-east-1"
+    aws_region: str = "ap-northeast-1"
     aws_access_key_id: str | None = None
     aws_secret_access_key: str | None = None
 

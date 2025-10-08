@@ -14,7 +14,7 @@ set -e
 
 # DynamoDB Localのエンドポイント設定
 ENDPOINT_URL="http://dynamodb-local:8000"
-REGION="us-east-1"
+REGION="ap-northeast-1"
 
 # スクリプトのディレクトリを取得
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

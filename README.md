@@ -72,17 +72,17 @@ export AWS_SECRET_ACCESS_KEY=dummy
 # テーブル一覧
 aws dynamodb list-tables \
   --endpoint-url http://dynamodb-local:8000 \
-  --region us-east-1
+  --region ap-northeast-1
 
 # テーブル定義の確認
 aws dynamodb describe-table \
   --table-name items \
   --endpoint-url http://dynamodb-local:8000 \
-  --region us-east-1
+  --region ap-northeast-1
 
 # テーブルの削除
 aws dynamodb delete-table \
   --table-name items \
   --endpoint-url http://dynamodb-local:8000 \
-  --region us-east-1
+  --region ap-northeast-1
 ```
