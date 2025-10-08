@@ -10,7 +10,15 @@ FastAPI + DynamoDB のサンプルプロジェクト
 uv sync
 ```
 
+DynamoDB Localにテーブルを作成:
+
+```bash
+bash ./dynamodb/create-tables-local.sh
+```
+
 ## 開発サーバー
+
+開発サーバーを起動する前に、上記のセットアップを完了してください。
 
 ```bash
 uv run fastapi dev
@@ -45,6 +53,14 @@ uv run pytest
 開発環境ではDynamoDB Localが起動しています:
 
 - **エンドポイント**: `http://dynamodb-local:8000`
+
+### テーブルの作成
+
+```bash
+bash ./dynamodb/create-tables-local.sh
+```
+
+このスクリプトは `dynamodb/table-definitions/` ディレクトリ内のJSON定義ファイルを読み込み、テーブルを作成します。
 
 ### AWS CLIでの操作例
 

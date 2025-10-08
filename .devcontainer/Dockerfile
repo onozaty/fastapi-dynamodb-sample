@@ -5,6 +5,7 @@ RUN pip install uv
 RUN apt-get update && apt-get install -y \
     sudo \
     locales \
+    jq \
  && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen \
