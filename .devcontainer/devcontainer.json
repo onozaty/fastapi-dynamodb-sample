@@ -11,10 +11,15 @@
         "ms-python.python",
         "charliermarsh.ruff",
         "tamasfe.even-better-toml"
-      ]
+      ],
+      "settings": {
+        "dev.containers.dockerCredentialHelper": false
+      }
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/aws-cli:latest": {}
+    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/customink/codespaces-features/sam-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   }
 }

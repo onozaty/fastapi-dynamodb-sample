@@ -1,0 +1,5 @@
+# Pythonキャッシュ（app/配下に生成される）
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc

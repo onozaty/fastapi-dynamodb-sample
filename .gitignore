@@ -6,3 +6,5 @@
 .devcontainer/dynamodb-data/
 coverage.xml
 coverage-html/
+.aws-sam/
+samconfig.toml

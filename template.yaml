@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Deploy the fastapi-dynamodb-sample container to AWS Lambda via AWS SAM.
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Architectures:
+      - x86_64
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: fastapi-dynamodb-sample-items
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  FastApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+      Environment:
+        Variables:
+          ITEMS_TABLE_NAME: !Ref ItemsTable
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: .
+      DockerTag: fastapi-dynamodb-sample
+
+Outputs:
+  ApiEndpoint:
+    Description: Invoke URL for the deployed FastAPI service
+    Value: !GetAtt HttpApi.ApiEndpoint
+  LambdaFunctionName:
+    Description: Name of the deployed Lambda function
+    Value: !Ref FastApiFunction
+  ItemsTableName:
+    Description: DynamoDB table backing the service
+    Value: !Ref ItemsTable

@@ -8,8 +8,9 @@ class ItemTable(Model):
     """PynamoDB ORMを使用したDynamoDB Itemテーブル。"""
 
     class Meta:  # type: ignore[misc]
-        table_name = "items"
-        region = settings.aws_region
+        table_name = settings.items_table_name
+        if settings.aws_region:
+            region = settings.aws_region
         if settings.dynamodb_endpoint_url:
             host = settings.dynamodb_endpoint_url
         if settings.aws_access_key_id:
