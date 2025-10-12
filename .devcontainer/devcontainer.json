@@ -5,6 +5,7 @@
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteUser": "vscode",
   "initializeCommand": "mkdir -p .devcontainer/dynamodb-data/",
+  "postCreateCommand": "uv sync",
   "customizations": {
     "vscode": {
       "extensions": [
