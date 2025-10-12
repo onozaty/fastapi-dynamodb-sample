@@ -99,37 +99,37 @@ aws dynamodb delete-table \
 
 1. ビルドします。
 
-  ```bash
-  sam build
-  ```
+    ```bash
+    sam build
+    ```
 
 2. 一度目のデプロイはガイド付きで実行し、ECR リポジトリなどの設定を保存します。
 
-  ```bash
-  sam deploy --guided
-  ```
+    ```bash
+    sam deploy --guided
+    ```
 
-  以下は設定例です。必要に応じて変更してください。
+    以下は設定例です。必要に応じて変更してください。
 
-  - **Stack Name**: `fastapi-dynamodb-sample`
-  - **AWS Region**: `ap-northeast-1`
-  - **Confirm changes before deploy**: `y`
-  - **Allow SAM CLI IAM role creation**: `y`
-  - **Disable rollback**: `n`
-  - **FastApiFunction has no authentication. Is this okay?**: `y`
-  - **Save arguments to samconfig.toml**: `y`
-  - **SAM configuration file**: `samconfig.toml`
-  - **SAM configuration environment**: `default`
-  - **Create managed ECR repositories for all functions?**: `y`
+    - **Stack Name**: `fastapi-dynamodb-sample`
+    - **AWS Region**: `ap-northeast-1`
+    - **Confirm changes before deploy**: `y`
+    - **Allow SAM CLI IAM role creation**: `y`
+    - **Disable rollback**: `n`
+    - **FastApiFunction has no authentication. Is this okay?**: `y`
+    - **Save arguments to samconfig.toml**: `y`
+    - **SAM configuration file**: `samconfig.toml`
+    - **SAM configuration environment**: `default`
+    - **Create managed ECR repositories for all functions?**: `y`
 
 3. 2回目以降は設定が `samconfig.toml` に保存されるため、次のコマンドだけで反映できます。
 
-  ```bash
-  sam build
-  sam deploy
-  ```
+    ```bash
+    sam build
+    sam deploy
+    ```
 
-3. デプロイ完了後、出力される API Gateway エンドポイント (`ApiEndpoint`) にアクセスすることで FastAPI アプリを利用できます。
+4. デプロイ完了後、出力される API Gateway エンドポイント (`ApiEndpoint`) にアクセスすることで FastAPI アプリを利用できます。
 
 ### DynamoDB テーブルについて
 
