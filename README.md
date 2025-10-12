@@ -1,30 +1,57 @@
 # fastapi-dynamodb-sample
 
-FastAPI + DynamoDB のサンプルプロジェクト
+FastAPI + DynamoDB のサンプルプロジェクトです。
 
-## セットアップ
+## 必要な環境
 
-依存関係のインストール:
+このプロジェクトは [Dev Container](https://containers.dev/) 環境で動作します。  
+VS Code の Dev Containers 拡張機能を使用すると、以下が自動的にセットアップされます。
+
+- Python 3.13
+- uv
+- AWS CLI
+- AWS SAM CLI
+- Docker CLI
+- DynamoDB Local (自動起動)
+
+**必要なもの:**
+- Docker ([Docker Desktop](https://www.docker.com/products/docker-desktop/) など)
+- [VS Code](https://code.visualstudio.com/)
+- [Dev Containers 拡張機能](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+## ローカル開発環境のセットアップ
+
+### 1. 依存関係のインストール
 
 ```bash
 uv sync
 ```
 
-DynamoDB Localにテーブルを作成:
+### 2. DynamoDB Localの起動とテーブル作成
+
+Dev Container環境ではDynamoDB Localが自動的に起動します (`http://dynamodb-local:8000`)。
+
+テーブルを作成:
 
 ```bash
 bash ./dynamodb/create-tables-local.sh
 ```
 
-## 開発サーバー
-
-開発サーバーを起動する前に、上記のセットアップを完了してください。
+### 3. 開発サーバーの起動
 
 ```bash
 uv run fastapi dev
 ```
 
-## コード品質チェック
+起動後、 http://127.0.0.1:8000/docs にアクセスするとAPI仕様を確認できます。
+
+## 開発ツール
+
+### テスト
+
+```bash
+uv run pytest
+```
 
 ### Linter/Formatter (Ruff)
 
@@ -42,17 +69,13 @@ uv run ruff format
 uv run pyright
 ```
 
-## テスト
-
-```bash
-uv run pytest
-```
-
-## DynamoDB Local
+## DynamoDB Localについて
 
 開発環境ではDynamoDB Localが起動しています:
 
 - **エンドポイント**: `http://dynamodb-local:8000`
+- **リージョン**: `ap-northeast-1` (設定値、実際のリージョンではありません)
+- **認証情報**: ダミー値 (`dummy`) で動作します
 
 ### テーブルの作成
 
@@ -62,92 +85,98 @@ bash ./dynamodb/create-tables-local.sh
 
 このスクリプトは `dynamodb/table-definitions/` ディレクトリ内のJSON定義ファイルを読み込み、テーブルを作成します。
 
-### AWS CLIでの操作例
+### AWS CLIでの操作
+
+DynamoDB Localに対してAWS CLIでテーブル操作を行う例:
 
 ```bash
-# 環境変数でダミー認証情報を設定
-export AWS_ACCESS_KEY_ID=dummy
-export AWS_SECRET_ACCESS_KEY=dummy
-
-# テーブル一覧
+# テーブル一覧を確認
 aws dynamodb list-tables \
   --endpoint-url http://dynamodb-local:8000 \
   --region ap-northeast-1
 
-# テーブル定義の確認
+# テーブル定義を確認
 aws dynamodb describe-table \
   --table-name items \
   --endpoint-url http://dynamodb-local:8000 \
   --region ap-northeast-1
 
-# テーブルの削除
+# テーブルを削除
 aws dynamodb delete-table \
   --table-name items \
   --endpoint-url http://dynamodb-local:8000 \
   --region ap-northeast-1
 ```
 
-## AWS Lambda (AWS SAM を使用したデプロイ)
+**注意**: DynamoDB Localへのアクセスには認証情報が不要ですが、AWS CLIの仕様上、環境変数に何らかの値を設定する必要があります。
 
-このプロジェクトは Docker イメージとして Lambda 上で稼働するための `Dockerfile` と `template.yaml` を含んでいます。AWS SAM CLI を利用することで、コンテナイメージのビルド・ECR へのプッシュ・API Gateway/Lambda/DynamoDB テーブルの作成を一括で行えます。
+```bash
+export AWS_ACCESS_KEY_ID=dummy
+export AWS_SECRET_ACCESS_KEY=dummy
+```
+
+## AWSへのデプロイ (AWS SAM)
+
+このプロジェクトは、AWS SAM を使用してコンテナイメージとして AWS Lambda にデプロイできます。  
+SAM CLI が、コンテナイメージのビルド・ECR へのプッシュ・API Gateway/Lambda/DynamoDB テーブルの作成を一括で行います。
 
 ### 前提条件
 
-- 認証情報が設定されていること
+AWS認証情報が設定されていることを確認してください。  
+設定方法は [AWS CLI の設定](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) を参照してください。
 
 ### デプロイ手順
 
-1. ビルドします。
-
-    ```bash
-    sam build
-    ```
-
-2. 一度目のデプロイはガイド付きで実行し、ECR リポジトリなどの設定を保存します。
-
-    ```bash
-    sam deploy --guided
-    ```
-
-    以下は設定例です。必要に応じて変更してください。
-
-    - **Stack Name**: `fastapi-dynamodb-sample`
-    - **AWS Region**: `ap-northeast-1`
-    - **Confirm changes before deploy**: `y`
-    - **Allow SAM CLI IAM role creation**: `y`
-    - **Disable rollback**: `n`
-    - **FastApiFunction has no authentication. Is this okay?**: `y`
-    - **Save arguments to samconfig.toml**: `y`
-    - **SAM configuration file**: `samconfig.toml`
-    - **SAM configuration environment**: `default`
-    - **Create managed ECR repositories for all functions?**: `y`
-
-3. 2回目以降は設定が `samconfig.toml` に保存されるため、次のコマンドだけで反映できます。
-
-    ```bash
-    sam build
-    sam deploy
-    ```
-
-4. デプロイ完了後、出力される API Gateway エンドポイント (`ApiEndpoint`) にアクセスすることで FastAPI アプリを利用できます。
-
-### DynamoDB テーブルについて
-
-- アプリケーションは環境変数 `ITEMS_TABLE_NAME` を参照し、未設定時は `items` を使用します（ローカル開発向け）。
-- SAM テンプレートでは `fastapi-dynamodb-sample-items` テーブルを作成し、その名称を `ITEMS_TABLE_NAME` として Lambda に渡しています。
-
-既存テーブルを利用する場合は、`template.yaml` のテーブル定義を削除/変更するか、デプロイ時に `ITEMS_TABLE_NAME` を別値に上書きしてください。
-
-SAM Local で DynamoDB Local を利用する場合は、SAM CLI の環境変数ファイル（例: `sam local start-api --env-vars env.json`）に `DYNAMODB_ENDPOINT_URL` を指定してください。
-
-### ローカル検証
-
-Lambda 実行環境での挙動を手元で確認する場合は次のコマンドを利用します。
+#### 1. ビルド
 
 ```bash
 sam build
-sam local start-api
 ```
 
-起動後、`http://127.0.0.1:3000/items` のようにアクセスできます。
+#### 2. 初回デプロイ (ガイド付き)
 
+初回デプロイ時は `--guided` オプションを使用して、対話形式で設定を行います:
+
+```bash
+sam deploy --guided
+```
+
+設定例:
+
+- **Stack Name**: `fastapi-dynamodb-sample`
+- **AWS Region**: `ap-northeast-1`
+- **Confirm changes before deploy**: `y`
+- **Allow SAM CLI IAM role creation**: `y`
+- **Disable rollback**: `n`
+- **FastApiFunction has no authentication. Is this okay?**: `y`
+- **Save arguments to samconfig.toml**: `y`
+- **SAM configuration file**: `samconfig.toml`
+- **SAM configuration environment**: `default`
+- **Create managed ECR repositories for all functions?**: `y`
+
+設定は `samconfig.toml` に保存されます。
+
+#### 3. 2回目以降のデプロイ
+
+設定が保存されているため、以下のコマンドだけでデプロイできます。
+
+```bash
+sam build
+sam deploy
+```
+
+#### 4. デプロイ完了後
+
+デプロイ完了後、出力される `ApiEndpoint` の値がAPI Gateway のエンドポイントURLです。  
+例: `https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/`
+
+このURLに `/items/` などのパスを追加してアクセスすることで、FastAPI アプリを利用できます。
+
+**API仕様の確認:**  
+エンドポイントURLに `/docs` を追加すると、FastAPIの自動生成ドキュメント(Swagger UI)にアクセスできます。  
+例: `https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/docs`
+
+### DynamoDB テーブルの設定
+
+- ローカル開発環境では、環境変数 `DYNAMODB_ITEMS_TABLE_NAME` が未設定の場合、デフォルトで `items` テーブル名を使用します
+- AWS環境では、SAM テンプレートが `fastapi-dynamodb-sample-items` という名前でテーブルを作成し、その名前を環境変数 `DYNAMODB_ITEMS_TABLE_NAME` として Lambda 関数に渡します
