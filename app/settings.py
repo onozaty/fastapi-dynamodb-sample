@@ -8,10 +8,10 @@ class Settings(BaseSettings):
 
     # DynamoDB設定
     dynamodb_endpoint_url: str | None = None
-    aws_region: str | None = None
-    aws_access_key_id: str | None = None
-    aws_secret_access_key: str | None = None
-    items_table_name: str | None = None
+    dynamodb_aws_access_key_id: str | None = None
+    dynamodb_aws_secret_access_key: str | None = None
+    dynamodb_region: str | None = None
+    dynamodb_items_table_name: str = "items"
 
     model_config = SettingsConfigDict(
         env_file=os.getenv("ENV_FILE", ".env"),

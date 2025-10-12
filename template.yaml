@@ -35,7 +35,7 @@ Resources:
             TableName: !Ref ItemsTable
       Environment:
         Variables:
-          ITEMS_TABLE_NAME: !Ref ItemsTable
+          DYNAMODB_ITEMS_TABLE_NAME: !Ref ItemsTable
       Events:
         ApiEvent:
           Type: HttpApi
