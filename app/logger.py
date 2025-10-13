@@ -6,7 +6,7 @@ from structlog.typing import EventDict, FilteringBoundLogger
 from app.settings import settings
 
 
-def order_keys(
+def _order_keys(
     logger: FilteringBoundLogger, method_name: str, event_dict: EventDict
 ) -> EventDict:
     """ログフィールドの順序を制御するプロセッサ。
@@ -31,7 +31,7 @@ def order_keys(
     return ordered
 
 
-def custom_text_renderer(
+def _custom_text_renderer(
     logger: FilteringBoundLogger, method_name: str, event_dict: EventDict
 ) -> str:
     """カスタムテキストレンダラー。
@@ -85,7 +85,7 @@ def setup_logging() -> None:
 
     # ログ形式に応じてレンダラーを選択
     if settings.log_format.lower() == "text":
-        renderer = custom_text_renderer
+        renderer = _custom_text_renderer
     else:
         renderer = structlog.processors.JSONRenderer()
 
@@ -96,7 +96,7 @@ def setup_logging() -> None:
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.ExceptionRenderer(),
-            order_keys,
+            _order_keys,
             renderer,
         ],
         wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
