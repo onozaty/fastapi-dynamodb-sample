@@ -6,6 +6,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """環境変数から読み込まれるアプリケーション設定。"""
 
+    # ログ設定
+    log_format: str = "json"  # "json" or "text"
+
     # DynamoDB設定
     dynamodb_endpoint_url: str | None = None
     dynamodb_aws_access_key_id: str | None = None
