@@ -60,4 +60,5 @@ output = "coverage.xml"
 [tool.pyright]
 include = ["app", "tests"]
 exclude = ["**/__pycache__", ".venv"]
+typeCheckingMode = "standard"
 
