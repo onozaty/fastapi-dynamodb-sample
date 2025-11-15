@@ -4,7 +4,6 @@ from typing import Awaitable, Callable
 
 import structlog
 from fastapi import FastAPI, Request, Response
-from mangum import Mangum
 
 from app.logger import get_logger, setup_logging
 from app.routers import items
@@ -18,20 +17,15 @@ app = FastAPI()
 
 app.include_router(items.router)
 
-handler = Mangum(app)
-
 
 @app.middleware("http")
 async def log_requests(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     """リクエスト/レスポンスをログに記録するミドルウェア。"""
-    # LambdaのリクエストIDを取得（Mangumが設定する）
-    lambda_context = request.scope.get("aws.context")
-    if lambda_context and hasattr(lambda_context, "aws_request_id"):
-        # Lambda環境: AWS Lambda のリクエストIDを使用
-        request_id = lambda_context.aws_request_id
-    else:
+    # LambdaのリクエストIDを取得（Lambda Web Adapterが設定するヘッダーから）
+    request_id = request.headers.get("x-amzn-request-id")
+    if not request_id:
         # ローカル環境: 新規UUIDを生成
         request_id = str(uuid.uuid4())
 
