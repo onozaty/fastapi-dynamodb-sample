@@ -18,6 +18,13 @@ app = FastAPI()
 
 app.include_router(items.router)
 
+
+@app.get("/ping")
+async def ping() -> dict[str, str]:
+    """ヘルスチェック用のpingエンドポイント。"""
+    return {"status": "ok"}
+
+
 handler = Mangum(app)
 
 
