@@ -36,5 +36,8 @@ COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
 # Copy the application code.
 COPY ./app ${LAMBDA_TASK_ROOT}/app
 
+# Pre-compile application code to improve Lambda cold-start performance.
+RUN python -m compileall -f -j 0 -q ${LAMBDA_TASK_ROOT}/app
+
 # Set the AWS Lambda handler.
 CMD ["app.main.handler"]
