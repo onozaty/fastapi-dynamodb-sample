@@ -39,6 +39,9 @@ COPY --from=builder /var/task /var/task
 # Copy the application code.
 COPY ./app /var/task/app
 
+# Pre-compile application code to improve Lambda cold-start performance.
+RUN python -m compileall -f -j 0 -q /var/task/app
+
 # Set working directory
 WORKDIR /var/task
 
