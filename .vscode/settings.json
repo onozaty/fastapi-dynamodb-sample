@@ -1,6 +1,9 @@
 {
     "python.defaultInterpreterPath": "./.venv/bin/python",
     "python.terminal.activateEnvironment": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.envFile": "", // デフォルトの.envを読み込んでしまうのを防ぐ
     "[python]": {
         "editor.codeActionsOnSave": {
             "source.fixAll.ruff": "explicit",
