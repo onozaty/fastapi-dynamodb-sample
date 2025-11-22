@@ -16,7 +16,9 @@ Resources:
   ItemsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: fastapi-dynamodb-sample-items
+      # スタック名を含めることで、複数デプロイ時のテーブル名競合を回避
+      # 例: fastapi-dev-alice-items, fastapi-dev-bob-items
+      TableName: !Sub '${AWS::StackName}-items'
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
