@@ -11,7 +11,9 @@
       "extensions": [
         "ms-python.python",
         "charliermarsh.ruff",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        // ghcr.io/devcontainers/features/aws-cliでAWS Toolkitが自動でインストールされるのを抑止
+        "-AmazonWebServices.aws-toolkit-vscode"
       ],
       "settings": {
         "dev.containers.dockerCredentialHelper": false
