@@ -2,6 +2,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Deploy the fastapi-dynamodb-sample container to AWS Lambda via AWS SAM.
 
+Parameters:
+  ProxyUrl:
+    Type: String
+    Default: ""
+    Description: Proxy URL for Docker build
+
 Globals:
   Function:
     Timeout: 30
@@ -49,6 +55,9 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: .
       DockerTag: fastapi-dynamodb-sample
+      DockerBuildArgs:
+        HTTP_PROXY: !Ref ProxyUrl
+        HTTPS_PROXY: !Ref ProxyUrl
 
 Outputs:
   ApiEndpoint:
