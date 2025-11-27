@@ -8,6 +8,7 @@ class Settings(BaseSettings):
 
     # ログ設定
     log_format: str = "json"  # "json" or "text"
+    log_level: str = "INFO"  # "DEBUG", "INFO", "WARNING", "ERROR"
 
     # DynamoDB設定
     dynamodb_endpoint_url: str | None = None

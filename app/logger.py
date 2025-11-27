@@ -74,11 +74,17 @@ def setup_logging() -> None:
 
     - Uvicornのアクセスログを抑止
     - structlogの出力形式を設定(JSON or テキスト)
-    - ログレベルをINFOに設定
+    - ログレベルを環境変数から設定
 
     環境変数LOG_FORMATで出力形式を制御:
     - "text": 人間が読みやすいテキスト形式(ローカル開発用)
     - "json": JSON形式(デフォルト、本番環境用)
+
+    環境変数LOG_LEVELでログレベルを制御:
+    - "DEBUG": デバッグログを含む全てのログを出力
+    - "INFO": 情報ログ以上を出力(デフォルト)
+    - "WARNING": 警告ログ以上を出力
+    - "ERROR": エラーログのみ出力
     """
     # Uvicornのアクセスログを抑止
     logging.getLogger("uvicorn.access").handlers.clear()
@@ -88,6 +94,10 @@ def setup_logging() -> None:
         renderer = _custom_text_renderer
     else:
         renderer = structlog.processors.JSONRenderer()
+
+    # ログレベルを環境変数から取得
+    log_level_str = settings.log_level.upper()
+    log_level = getattr(logging, log_level_str, logging.INFO)
 
     # structlogの設定
     structlog.configure(
@@ -99,7 +109,7 @@ def setup_logging() -> None:
             _order_keys,
             renderer,
         ],
-        wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+        wrapper_class=structlog.make_filtering_bound_logger(log_level),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=False,
