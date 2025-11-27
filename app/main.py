@@ -6,6 +6,7 @@ import structlog
 from fastapi import FastAPI, Request, Response
 from mangum import Mangum
 
+from app.auth import get_jwt_claims, get_user_id, get_username
 from app.logger import get_logger, setup_logging
 from app.routers import items
 
@@ -45,6 +46,22 @@ async def log_requests(
     # structlogのコンテキストにリクエストIDを設定
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(request_id=request_id)
+
+    # Log JWT claims if present (for authentication verification)
+    claims = get_jwt_claims(request)
+    if claims:
+        user_id = get_user_id(request)
+        username = get_username(request)
+        structlog.contextvars.bind_contextvars(
+            user_id=user_id,
+            username=username,
+        )
+        logger.debug(
+            "Authenticated request",
+            user_id=user_id,
+            username=username,
+            claims=claims,
+        )
 
     start_time = time.time()
 

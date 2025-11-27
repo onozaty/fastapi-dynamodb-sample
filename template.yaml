@@ -18,6 +18,16 @@ Globals:
 Resources:
   HttpApi:
     Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}'
+              audience:
+                - !Ref UserPoolClient
+        DefaultAuthorizer: CognitoAuthorizer
 
   ItemsTable:
     Type: AWS::DynamoDB::Table
@@ -33,6 +43,49 @@ Resources:
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
 
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${AWS::StackName}-users'
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+      MfaConfiguration: 'OFF'
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub '${AWS::StackName}-client'
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+
   FastApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -44,7 +97,16 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_ITEMS_TABLE_NAME: !Ref ItemsTable
+          LOG_LEVEL: DEBUG
       Events:
+        HealthCheck:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /health
+            Method: GET
+            Auth:
+              Authorizer: NONE
         ApiEvent:
           Type: HttpApi
           Properties:
@@ -63,9 +125,23 @@ Outputs:
   ApiEndpoint:
     Description: Invoke URL for the deployed FastAPI service
     Value: !GetAtt HttpApi.ApiEndpoint
+
   LambdaFunctionName:
     Description: Name of the deployed Lambda function
     Value: !Ref FastApiFunction
+
   ItemsTableName:
     Description: DynamoDB table backing the service
     Value: !Ref ItemsTable
+
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref UserPool
+
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref UserPoolClient
+
+  UserPoolArn:
+    Description: Cognito User Pool ARN
+    Value: !GetAtt UserPool.Arn
