@@ -115,6 +115,17 @@ export AWS_ACCESS_KEY_ID=dummy
 export AWS_SECRET_ACCESS_KEY=dummy
 ```
 
+### DynamoDB Admin (GUI)
+
+DynamoDB Localの内容をブラウザから確認できるGUIツール([dynamodb-admin](https://github.com/aaronshaf/dynamodb-admin))が起動しています:
+
+- **URL**: http://localhost:8001
+
+ブラウザでアクセスすると、以下の操作が可能です:
+- テーブル一覧の表示
+- テーブルデータの参照
+- アイテムの追加・編集・削除
+
 ## AWSへのデプロイ (AWS SAM)
 
 このプロジェクトは、AWS SAM を使用してコンテナイメージとして AWS Lambda にデプロイできます。  

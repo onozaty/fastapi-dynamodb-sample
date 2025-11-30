@@ -4,8 +4,7 @@
   "service": "app",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "remoteUser": "vscode",
-  "initializeCommand": "mkdir -p .devcontainer/dynamodb-data/",
-  "postCreateCommand": "uv sync",
+  "postCreateCommand": "uv sync && bash ./dynamodb/create-tables-local.sh",
   "customizations": {
     "vscode": {
       "extensions": [

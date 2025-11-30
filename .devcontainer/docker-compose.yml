@@ -11,10 +11,10 @@ services:
     environment:
       - HTTP_PROXY=${HTTP_PROXY-}
       - HTTPS_PROXY=${HTTPS_PROXY-}
-      - NO_PROXY=${NO_PROXY:+${NO_PROXY},}dynamodb-local
+      - NO_PROXY=dynamodb-local,${NO_PROXY-}
       - http_proxy=${HTTP_PROXY-}
       - https_proxy=${HTTPS_PROXY-}
-      - no_proxy=${NO_PROXY:+${NO_PROXY},}dynamodb-local
+      - no_proxy=dynamodb-local,${NO_PROXY-}
       - UV_LINK_MODE=copy 
     depends_on:
       - dynamodb-local
@@ -24,8 +24,18 @@ services:
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"
-    ports:
-      - "8000:8000"
     volumes:
-      - "./dynamodb-data:/home/dynamodblocal/data"
+      - dynamodb-data:/home/dynamodblocal/data
     working_dir: /home/dynamodblocal
+    user: root # ボリュームマウントしたフォルダに書き込めるように
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+    depends_on:
+      - dynamodb-local
+
+volumes:
+  dynamodb-data:
