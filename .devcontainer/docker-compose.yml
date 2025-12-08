@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      network: host
       args:
         HTTP_PROXY: ${HTTP_PROXY-}
         HTTPS_PROXY: ${HTTPS_PROXY-}
@@ -17,19 +16,36 @@ services:
       - no_proxy=dynamodb-local,${NO_PROXY-}
       - UV_LINK_MODE=copy 
     depends_on:
-      - dynamodb-local
+      dynamodb-local:
+        condition: service_healthy
     volumes:
       - ../..:/workspaces:cached
     command: sleep infinity
+
   dynamodb-local:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
+    image: "amazon/dynamodb-local:3.1.0"
+    environment:
+      - HTTP_PROXY=${HTTP_PROXY-}
+      - HTTPS_PROXY=${HTTPS_PROXY-}
+      - NO_PROXY=${NO_PROXY-}
+      - http_proxy=${HTTP_PROXY-}
+      - https_proxy=${HTTPS_PROXY-}
+      - no_proxy=${NO_PROXY-}
     volumes:
       - dynamodb-data:/home/dynamodblocal/data
     working_dir: /home/dynamodblocal
     user: root # ボリュームマウントしたフォルダに書き込めるように
+    healthcheck:
+      # 起動が完了すると400を返すようになるので
+      test: curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/ | grep -q '400'
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   dynamodb-admin:
-    image: aaronshaf/dynamodb-admin
+    image: aaronshaf/dynamodb-admin:5.1.3
     ports:
       - "8001:8001"
     environment:
